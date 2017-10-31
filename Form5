@@ -1,0 +1,49 @@
+Imports MySql.Data.MySqlClient
+Imports System.IO
+Public Class Form5
+    Dim sqlDB As MySqlConnection
+    Public referenceID As String
+    Private Sub Form5_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        sqlDB = New MySqlConnection
+        myfun()
+        sqlDB.Open()
+        If sqlDB.State = ConnectionState.Open Then
+            Dim sqlCommand As New MySqlCommand
+            sqlCommand.Connection = sqlDB
+            sqlCommand.CommandText = "SELECT * FROM voterdb WHERE id = '" & referenceID & "'"
+            Dim readDB As MySqlDataReader
+            readDB = sqlCommand.ExecuteReader
+            readDB.Read()
+            If (readDB.HasRows) Then
+                VoterName1.Text = readDB.GetString(4)
+                VoterName.Text = readDB.GetString(4)
+                National_ID.Text = readDB.GetString(2)
+                VoterVillage.Text = readDB.GetString(10)
+                VoterPolling.Text = readDB.GetString(11)
+                VoterGewog.Text = readDB.GetString(9)
+                VoterConstituency.Text = readDB.GetString(8)
+                VoterDistrict.Text = readDB.GetString(7)
+                Dim img() As Byte
+                img = readDB(12)
+                Dim ms As New MemoryStream(img)
+                VoterPhoto.Image = Image.FromStream(ms)
+            End If
+            readDB.Close()
+        End If
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim url As String = "http://localhost/fingerprint/index.php?id=" & referenceID
+        Process.Start(url)
+        referenceID = ""
+        sqlDB.Close()
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Environment.Exit(0)
+    End Sub
+    Private Sub myfun()
+        sqlDB.ConnectionString = "server=127.0.0.1;user id=root;password=;database=fingerprintvb"
+    End Sub
+
+End Class
